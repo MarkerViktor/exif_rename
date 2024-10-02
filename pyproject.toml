@@ -1,0 +1,16 @@
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "exif_renamer"
+version = "0.1.0"
+description = ""
+authors = ["Marker Victor <MarkerViktor@outlook.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+ExifRead = "^3.0.0"
+hachoir = "^3.3.0"
+
