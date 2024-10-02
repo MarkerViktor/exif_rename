@@ -1,6 +1,6 @@
 Устанавливаем библиотеку
 ```bash
-pip install ''
+pip install 'git+ssh://github.com/MarkerViktor/exif_rename.git'
 ```
 
 Пример использования
