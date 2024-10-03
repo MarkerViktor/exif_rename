@@ -1,29 +1,36 @@
 import argparse
-from datetime import datetime as Datetime
+from datetime import datetime as Datetime, timezone
 from pathlib import Path
 
 import exifread
+import pytz
 from hachoir.parser import createParser
 from hachoir.metadata import extractMetadata
 
 
-def get_image_creation_date(file_path):
+def get_image_creation_date(file_path) -> Datetime | None:
     """Извлекает дату создания изображения из EXIF данных."""
     with open(file_path, 'rb') as f:
         tags = exifread.process_file(f, stop_tag="EXIF DateTimeOriginal")
-        date_taken = tags.get("EXIF DateTimeOriginal")
-        if date_taken:
-            return Datetime.strptime(str(date_taken), '%Y:%m:%d %H:%M:%S')
-    return None
+        if raw_date := tags.get("EXIF DateTimeOriginal"):
+            date_string = str(raw_date)
+            pattern = "%Y:%m:%d %H:%M:%S"
 
+            if raw_tz := tags.get("EXIF OffsetTimeOriginal"):
+                date_string += str(raw_tz).replace(":", "")
+                pattern += "%z"
+
+            return Datetime.strptime(date_string, pattern).astimezone(pytz.UTC)
+
+    return None
 
 def get_video_creation_date(file_path) -> Datetime | None:
     """Извлекает дату создания видео из метаданных."""
-    parser = createParser(str(file_path))
-    with parser:
+    with createParser(str(file_path)) as parser:
         metadata = extractMetadata(parser)
         if metadata and metadata.has("creation_date"):
             return metadata.get("creation_date")
+
     return None
 
 
